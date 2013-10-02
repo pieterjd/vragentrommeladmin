@@ -46,7 +46,7 @@ function vragentrommeladmin_enable_courses($form,&$form_state){
   }
   //setting default values
   $defaults = array();
-  foreach(variable_get('vragentrommel_enabled_courses') as $key => $value){
+  foreach(variable_get('vragentrommel_enabled_courses',array()) as $key => $value){
     $defaults[] = $value;
   }
   $form['courses'] = array(
