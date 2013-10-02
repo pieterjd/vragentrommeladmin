@@ -1,0 +1,81 @@
+<?php
+/**
+ * @file
+ * Code for the Vragentrommel feature.
+ */
+
+function vragentrommeladmin_menu(){
+  drupal_set_message('vt hook_menu');
+  //add config block
+  $menu['admin/config/vragentrommel'] = array(
+    'title' => ' Vragentrommel',
+    'description' => 'Vragentrommel settings',
+    'position' => 'left',
+    'weight' => -8,
+    'page callback' => 'system_admin_menu_block_page',
+    'access callback' => TRUE,
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    
+  );
+  $menu['admin/config/vragentrommel/enablecourses'] = array(
+    'title' => 'Enable courses',
+    'description' => 'Enabled or disable courses for questions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vragentrommeladmin_enable_courses'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('access administration pages'),
+  );
+  
+  return $menu;
+
+}
+
+function vragentrommeladmin_enable_courses($form,&$form_state){
+  //get chapters vocabulary
+  $vid = taxonomy_vocabulary_machine_name_load('chapters')->vid;
+  //get root terms
+  $terms = taxonomy_get_tree($vid,0,1);
+  //dsm(array_values(variable_get('vragentrommel_enabled_courses')));
+  //create options for checkboxes
+  $options = array();
+  foreach($terms as $term){
+    //term id is the return value, the name is the label of the checkbox
+    //$term->name +' '+
+    $options[$term->tid] = $term->name;
+  }
+  //setting default values
+  $defaults = array();
+  foreach(variable_get('vragentrommel_enabled_courses') as $key => $value){
+    $defaults[] = $value;
+  }
+  $form['courses'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => 'What courses should be enabled for questioning?',
+    ////default value is an array of values
+    '#default_value' =>$defaults,
+    
+    
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Enable courses',
+  );
+  return $form;
+}
+
+function vragentrommeladmin_enable_courses_submit($form,&$form_state){
+  //dsm($form_state['values']);
+  $checkboxes = $form_state['values']['courses'];
+  $selected = array();
+  foreach($checkboxes as $key => $value){
+    //if checkbox is selected, the add key  to selected array
+    if($value != 0){
+      $selected[] = $key;
+    }
+  }
+  //save it to the right variable
+  variable_set('vragentrommel_enabled_courses',$selected);
+  //dsm($selected);
+}

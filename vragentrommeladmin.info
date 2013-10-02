@@ -1,0 +1,7 @@
+name = Vragentrommel Admin
+core = 7.x
+package = Vragentrommel
+
+dependencies[] = vragentrommel
+
+files[] = vragentrommeladmin.module
